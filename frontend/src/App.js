@@ -6,9 +6,11 @@ import AddBookMain from './components/AddBookMain';
 import Dashboard from './components/Dashboard';
 import Login from './components/Login';
 import Signup from './components/Signup';
+import Qdashboard from './components/quotes/Qdashboard';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { ThemeProvider } from './context/ThemeContext';
 import PrivateRoute from './components/PrivateRoute';
+import '@fortawesome/fontawesome-free/css/all.min.css';
 
 export default function App() {
   return (
@@ -29,6 +31,7 @@ export default function App() {
               </PrivateRoute>
             }
           />
+          <Route path="/quotes" element={<Qdashboard />} />
         </Routes>
       </AuthProvider>
     </ThemeProvider>

@@ -1,0 +1,22 @@
+useState: When you need to remember or store something that changes
+useEffect: When you want to run something automatically when the page loads or changes
+Functions: When you want to do something based on user actions
+
+Do I need to remember something over time? → useState
+
+Do I want to do something when the page loads? → useEffect
+
+Do I want to respond to a user action (type, click)? → function
+
+Do I want to style something based on a condition? → function (usually using state)
+
+| What you want to do                                           | What you should use                         |
+| ------------------------------------------------------------- | ------------------------------------------- |
+| I want to **remember** what user typed                        | ✅ `useState` (for formData)                 |
+| I want to show **red border** if field is empty               | ✅ `useState` (for touchedFields)            |
+| I want to **run something when page opens**                   | ✅ `useEffect` (for clearing old login data) |
+| I want to **run code when user types**                        | ✅ Function: `handleChange`                  |
+| I want to **run code when they click Login**                  | ✅ Function: `handleSubmit`                  |
+| I want to **style input differently** based on its state      | ✅ Function: `getInputStyles`                |
+| I want to **mark field as touched** when they click out of it | ✅ Function: `handleBlur`                    |
+| I want to **show a message** if login worked                  | ✅ `useState` (for `success`)                |

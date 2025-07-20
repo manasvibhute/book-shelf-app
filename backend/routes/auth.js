@@ -12,29 +12,29 @@ const generateToken = (user) => {
 // Register
 // Register
 router.post('/register', async (req, res) => {
-  try {
-    const { name, email, password } = req.body;
+    try {
+        const { name, email, password } = req.body;
 
-    // Validate input
-    if (!name || !email || !password) {
-      return res.status(400).json({ error: 'All fields are required' });
+        // Validate input
+        if (!name || !email || !password) {
+            return res.status(400).json({ error: 'All fields are required' });
+        }
+
+        const exists = await User.findOne({ email });
+        if (exists) return res.status(400).json({ error: 'User already exists' });
+
+        const user = await User.create({ name, email, password }); // ✅ Create user first
+
+        const token = generateToken(user);
+
+        res.status(201).json({
+            token,
+            user: { id: user._id, name: user.name, email: user.email }
+        });
+    } catch (err) {
+        console.error('Registration error:', err);
+        res.status(500).json({ error: 'Server error during registration' });
     }
-
-    const exists = await User.findOne({ email });
-    if (exists) return res.status(400).json({ error: 'User already exists' });
-
-    const user = await User.create({ name, email, password }); // ✅ Create user first
-
-    const token = generateToken(user);
-
-    res.status(201).json({
-      token,
-      user: { id: user._id, name: user.name, email: user.email }
-    });
-  } catch (err) {
-    console.error('Registration error:', err);
-    res.status(500).json({ error: 'Server error during registration' });
-  }
 });
 
 
@@ -48,6 +48,8 @@ router.post('/login', async (req, res) => {
         }
 
         const user = await User.findOne({ email });
+        console.log("Login attempt for:", email);
+        console.log("User found?", !!user);
         if (!user) {
             return res.status(401).json({ error: 'Invalid credentials' });
         }
@@ -79,6 +81,7 @@ router.get('/me', protect, async (req, res) => {
                 email: req.user.email,
             },
         });
+        console.log("🔍 req.user:", req.user);
     } catch (err) {
         console.error('Me route error:', err);
         res.status(500).json({ error: 'Server error fetching user data' });

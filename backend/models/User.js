@@ -25,7 +25,7 @@ userSchema.pre('save', async function (next) {
 });
 
 // Method to compare password
-userSchema.methods.comparePassword = function (enteredPassword) {
+userSchema.methods.comparePassword = function (enteredPassword) { //Used during login to check if the entered password matches the stored (hashed) one.
   return bcrypt.compare(enteredPassword, this.password);
 };
 

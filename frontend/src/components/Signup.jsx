@@ -4,11 +4,28 @@ import { TextField, Button, Typography, Box, Card, CardContent } from '@mui/mate
 
 function Signup() {
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
+  const [touchedFields, setTouchedFields] = useState({
+    name: false,
+    email: false,
+    password: false
+  });
   const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Mark all fields as touched
+    setTouchedFields({
+      name: true,
+      email: true,
+      password: true
+    });
+
+    // Check if any field is empty
+    if (!formData.name || !formData.email || !formData.password) {
+      return;
+    }
 
     const res = await fetch('http://localhost:5000/api/auth/register', {
       method: 'POST',
@@ -21,25 +38,49 @@ function Signup() {
     if (res.ok) {
       setSuccess(true);
       setTimeout(() => navigate('/login'), 2000);
-    } else {
-      alert(data.error || 'Signup failed');
     }
   };
 
-  const inputStyles = {
-    '& .MuiOutlinedInput-root': {
-      borderRadius: '12px',
-      backgroundColor: '#ffffff',
-    },
-    '& .MuiOutlinedInput-notchedOutline': {
-      borderColor: '#999',
-    },
-    '&:hover .MuiOutlinedInput-notchedOutline': {
-      borderColor: '#666',
-    },
-    '& .MuiInputLabel-root': {
-      color: '#333',
-    },
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    
+    // Mark the field as touched
+    if (!touchedFields[name]) {
+      setTouchedFields(prev => ({ ...prev, [name]: true }));
+    }
+  };
+
+  const handleBlur = (e) => {
+    const { name } = e.target;
+    setTouchedFields(prev => ({ ...prev, [name]: true }));
+  };
+
+  const getInputStyles = (fieldName) => {
+    const isTouched = touchedFields[fieldName];
+    const hasValue = formData[fieldName].trim() !== '';
+    
+    return {
+      '& .MuiOutlinedInput-root': {
+        borderRadius: '12px',
+        backgroundColor: '#ffffff',
+        '& fieldset': {
+          borderColor: hasValue ? '#4caf50' : (isTouched ? '#f44336' : '#999'),
+        },
+        '&:hover fieldset': {
+          borderColor: hasValue ? '#2e7d32' : (isTouched ? '#d32f2f' : '#666'),
+        },
+        '&.Mui-focused fieldset': {
+          borderColor: hasValue ? '#2e7d32' : (isTouched ? '#d32f2f' : '#3f51b5'),
+        },
+      },
+      '& .MuiInputLabel-root': {
+        color: hasValue ? '#4caf50' : (isTouched ? '#f44336' : '#333'),
+      },
+      '& .MuiFormHelperText-root': {
+        color: isTouched && !hasValue ? '#f44336' : 'inherit',
+      },
+    };
   };
 
   return (
@@ -55,29 +96,41 @@ function Signup() {
 
           <form onSubmit={handleSubmit}>
             <TextField
+              name="name"
               label="Name"
               fullWidth
               margin="normal"
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              sx={inputStyles}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              error={touchedFields.name && !formData.name.trim()}
+              helperText={touchedFields.name && !formData.name.trim() ? 'Name is required' : ''}
+              sx={getInputStyles('name')}
             />
             <TextField
+              name="email"
               label="Email"
               fullWidth
               margin="normal"
               value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              sx={inputStyles}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              error={touchedFields.email && !formData.email.trim()}
+              helperText={touchedFields.email && !formData.email.trim() ? 'Email is required' : ''}
+              sx={getInputStyles('email')}
             />
             <TextField
+              name="password"
               label="Password"
               type="password"
               fullWidth
               margin="normal"
               value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              sx={inputStyles}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              error={touchedFields.password && !formData.password.trim()}
+              helperText={touchedFields.password && !formData.password.trim() ? 'Password is required' : ''}
+              sx={getInputStyles('password')}
             />
             <Button type="submit" variant="contained" fullWidth sx={{ mt: 2 }}>
               Create Account

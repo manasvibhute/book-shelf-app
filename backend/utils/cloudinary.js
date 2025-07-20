@@ -1,6 +1,6 @@
 const cloudinary = require('cloudinary').v2;
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
-const multer = require('multer');
+const { CloudinaryStorage } = require('multer-storage-cloudinary'); //This is a special storage engine for multer that:Saves files directly to Cloudinary
+const multer = require('multer'); //multer is a middleware used to handle multipart/form-data (file uploads) in Express and It will parse the uploaded file before it hits your route handler
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,

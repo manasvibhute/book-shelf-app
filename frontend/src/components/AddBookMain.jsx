@@ -16,19 +16,38 @@ function AddBookMain() {
 
     useEffect(() => {
         const fetchBooks = async () => {
-            const res = await fetch('http://localhost:5000/api/books');
-            const data = await res.json();
-            if (Array.isArray(data)) {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    console.warn("⚠️ No token found in localStorage.");
+                    return;
+                }
+
+                const res = await fetch('http://localhost:5000/api/books', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await res.json();
+
+                if (!Array.isArray(data)) {
+                    console.warn("⚠️ Books fetch returned non-array:", data);
+                    return;
+                }
+
                 setBooks(data);
-            } else {
-                console.error('Books fetch returned non-array:', data);
-                setBooks([]);
+            } catch (err) {
+                console.error("❌ Error fetching books:", err);
             }
         };
+
         fetchBooks();
     }, []);
 
     const handleAddBook = async (newBook) => {
+        console.log("📚 onAddBook called with:", newBook); 
         const token = localStorage.getItem('token');
         const userId = localStorage.getItem('userId');
 
@@ -43,15 +62,16 @@ function AddBookMain() {
             });
 
             const savedBook = await res.json();
+            console.log("✅ Saved to DB:", savedBook);
+            
             setBooks((prev) => [...prev, savedBook]);
+            navigate('/dashboard');
         } catch (err) {
             console.error('Error adding book:', err);
         }
     };
 
-
-
-    const handleDelete = async (id) => {
+     const handleDelete = async (id) => {
         const res = await fetch(`http://localhost:5000/api/books/${id}`, {
             method: 'DELETE',
         });

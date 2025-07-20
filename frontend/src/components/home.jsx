@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import AuthCard from './AuthCard';
 import '../stylesheets/home.css'; // External CSS file
 
 const books = [
@@ -11,7 +10,6 @@ const books = [
 ];
 
 export default function BookShelfApp() {
-  const [showAuth, setShowAuth] = useState(false);
   const navigate = useNavigate();
 
   const handleGetStarted = () => {
@@ -44,7 +42,6 @@ export default function BookShelfApp() {
           <button className="get-started-button" onClick={handleGetStarted}>
             Get Started
           </button>
-          {showAuth && <AuthCard onClose={() => setShowAuth(false)} />}
         </div>
 
         {/* Bottom row - Slightly taller covers */}
@@ -54,16 +51,6 @@ export default function BookShelfApp() {
           </div>
         ))}
       </div>
-
-      {/* AuthCard as popup */}
-      {showAuth && (
-        <div className="auth-popup-overlay">
-          <div className="auth-popup">
-            <button className="close-btn" onClick={() => setShowAuth(false)}>×</button>
-            <AuthCard />
-          </div>
-        </div>
-      )}
     </div>
   );
 }

@@ -16,7 +16,7 @@ router.post('/upload', protect, upload.single('cover'), async (req, res) => {
   }
 
   try {
-    const result = await cloudinary.uploader.upload(req.file.path, {
+    const result = await cloudinary.uploader.upload(req.file.path, { //uploads the image to the Cloudinary server.
       folder: 'book-covers',
     });
 

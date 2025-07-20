@@ -1,0 +1,62 @@
+/* quoteStrip.css */
+
+.quote-strip-container {
+    padding: 13px;
+    padding-top: 12px;
+    margin-top: 30px;
+    border-radius: 12px;
+    margin-bottom: 40px;
+    background-color: #f9f9f9;
+    overflow-x: auto;
+    white-space: nowrap;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    overflow: auto;
+}
+
+body.dark .quote-strip-container {
+  background-color: #2a2a2a; /* enforce in dark mode too */
+}
+
+.quote-strip {
+    display: flex;
+    gap: 16px;
+    scroll-snap-type: x mandatory;
+}
+
+.quote-box {
+    flex: 0 0 auto;
+    margin-top: 2px;
+    width: 200px;
+    height: 100px;
+    background: #fff7e6;
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.quote-box:hover {
+    transform: scale(1.05);
+}
+
+.quote-text {
+    font-size: 1rem;
+    font-style: italic;
+    color: #444;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+    line-height: 1.4;
+    margin-bottom: 8px;
+}
+
+.quote-author {
+    font-size: 0.85rem;
+    color: #777;
+}

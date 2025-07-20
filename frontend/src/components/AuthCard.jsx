@@ -8,7 +8,7 @@ const AuthCard = () => {
   const [isLogin, setIsLogin] = useState(true);
 
   return (
-    <Card sx={{ maxWidth: 400, mx: 'auto', mt: 4, p: 2 }}>
+    <Card sx={{ backgroundColor:'#fef3e3',maxWidth: 400, mx: 'auto', mt: 4, p: 2 }}>
       <CardContent>
         <Typography variant="h5" align="center">
           {isLogin ? 'Login to BookShelf' : 'Create an Account'}

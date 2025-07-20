@@ -6,34 +6,38 @@ import { Card, CardContent, Typography, TextField, Button, MenuItem, Box } from 
 
 const statuses = ['Want to Read', 'Reading', 'Finished'];
 
-const inputStyles = {
+const getInputStyles = (isValid, isRequired) => ({
     '& .MuiOutlinedInput-root': {
         height: 38,
         borderRadius: '12px',
         backgroundColor: '#fff',
-    },
-    '& .MuiOutlinedInput-notchedOutline': {
-        borderColor: '#ccc',
-    },
-    '&:hover .MuiOutlinedInput-notchedOutline': {
-        borderColor: '#888',
+        '& fieldset': {
+            borderColor: isValid ? '#4caf50' : (isRequired ? '#f44336' : '#ccc'),
+        },
+        '&:hover fieldset': {
+            borderColor: isValid ? '#2e7d32' : (isRequired ? '#d32f2f' : '#888'),
+        },
+        '&.Mui-focused fieldset': {
+            borderColor: isValid ? '#2e7d32' : (isRequired ? '#d32f2f' : '#3f51b5'),
+        },
     },
     '& .MuiInputLabel-root': {
         fontSize: '13px',
-        transform: 'translate(14px, 9px) scale(1)', // Centers the label vertically
+        transform: 'translate(14px, 9px) scale(1)',
         '&.MuiInputLabel-shrink': {
-            transform: 'translate(14px, -9px) scale(0.75)', // Position when shrunk (focused/with value)
+            transform: 'translate(14px, -9px) scale(0.75)',
         },
+        color: isValid ? '#4caf50' : (isRequired ? '#f44336' : 'inherit'),
     },
     '& input': {
         padding: '10px',
         fontSize: '14px',
     },
-    marginBottom: '20px', // Adds 20px gap below each input
+    marginBottom: '20px',
     '&:last-child': {
-        marginBottom: '0', // Removes gap for the last element
+        marginBottom: '0',
     }
-};
+});
 
 const initialFormData = {
     title: '',
@@ -48,6 +52,12 @@ const initialFormData = {
 
 export default function AddBookForm({ onAddBook, onUpdateBook, selectedBook, setSelectedBook }) {
     const [formData, setFormData] = useState(initialFormData);
+    const [useUrl, setUseUrl] = useState(true);
+    const [touchedFields, setTouchedFields] = useState({
+        title: false,
+        author: false,
+        genre: false
+    });
 
     useEffect(() => {
         if (selectedBook) {
@@ -90,56 +100,95 @@ export default function AddBookForm({ onAddBook, onUpdateBook, selectedBook, set
         }
     };
 
-
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
+
+        // Mark the field as touched if it's a required field
+        if (['title', 'author', 'genre'].includes(name)) {
+            setTouchedFields(prev => ({ ...prev, [name]: true }));
+        }
+    };
+
+    const handleBlur = (e) => {
+        const { name } = e.target;
+        if (['title', 'author', 'genre'].includes(name)) {
+            setTouchedFields(prev => ({ ...prev, [name]: true }));
+        }
     };
 
     const handleSubmit = (e) => {
+        console.log('📤 Attempting to submit form:', formData);
         e.preventDefault();
-        if (!formData.title) return alert('Title is required');
+
+        // Mark all required fields as touched
+        setTouchedFields({
+            title: true,
+            author: true,
+            genre: true
+        });
+
+        // Check if required fields are filled
+        if (!formData.title || !formData.author || !formData.genre) {
+            console.warn("❌ Submission blocked: Missing required fields", formData);
+            return;
+        }
 
         selectedBook ? onUpdateBook(selectedBook._id, formData) : onAddBook(formData);
-
         setFormData(initialFormData);
         setSelectedBook?.(null);
     };
 
-    const renderTextField = (name, label, props = {}) => (
-        <TextField
-            label={label}
-            name={name}
-            value={formData[name]}
-            onChange={handleChange}
-            fullWidth
-            margin="dense"
-            sx={inputStyles}
-            {...props}
-        />
-    );
+    const renderTextField = (name, label, isRequired = false, props = {}) => {
+        const isValid = formData[name] && formData[name].trim() !== '';
+        const showError = isRequired && touchedFields[name] && !isValid;
 
-    const renderSelectField = (name, label, options, props = {}) => (
-        <TextField
-            select
-            label={label}
-            name={name}
-            value={formData[name]}
-            onChange={handleChange}
-            fullWidth
-            margin="dense"
-            sx={inputStyles}
-            {...props}
-        >
-            {options.map(option => (
-                <MenuItem key={option} value={option}>{option}</MenuItem>
-            ))}
-        </TextField>
-    );
+        return (
+            <TextField
+                label={label}
+                name={name}
+                value={formData[name]}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                fullWidth
+                margin="dense"
+                sx={getInputStyles(isValid, showError)}
+                error={showError}
+                helperText={showError ? `${label} is required` : ''}
+                {...props}
+            />
+        );
+    };
+
+    const renderSelectField = (name, label, options, isRequired = false, props = {}) => {
+        const isValid = formData[name] && formData[name].trim() !== '';
+        const showError = isRequired && touchedFields[name] && !isValid;
+
+        return (
+            <TextField
+                select
+                label={label}
+                name={name}
+                value={formData[name]}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                fullWidth
+                margin="dense"
+                sx={getInputStyles(isValid, showError)}
+                error={showError}
+                helperText={showError ? `${label} is required` : ''}
+                {...props}
+            >
+                {options.map(option => (
+                    <MenuItem key={option} value={option}>{option}</MenuItem>
+                ))}
+            </TextField>
+        );
+    };
 
     return (
         <Card sx={{
-            maxWidth: 360, margin: '0 auto', p: 0, boxShadow: 3, borderRadius: 12, maxHeight: '75vh',       // ✅ Prevents page scroll
+            maxWidth: 360, margin: '0 auto', p: 0, boxShadow: 3, borderRadius: 12, maxHeight: '75vh',
             overflowY: 'auto',
         }}>
             <CardContent sx={{ p: '16px 24px' }}>
@@ -148,15 +197,35 @@ export default function AddBookForm({ onAddBook, onUpdateBook, selectedBook, set
                 </Typography>
 
                 <Box component="form" onSubmit={handleSubmit} noValidate>
-                    {renderTextField('title', 'Title', { required: true })}
-                    {renderTextField('author', 'Author')}
-                    <Typography variant="subtitle2" sx={{ mb: 1 }}>Upload Cover Image</Typography>
-                    <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleFileUpload}
-                        style={{ marginBottom: '16px' }}
-                    />
+                    {renderTextField('title', 'Title', true, { required: true })}
+                    {renderTextField('author', 'Author', true)}
+                    <TextField
+                        select
+                        label="Cover Image Method"
+                        value={useUrl ? 'url' : 'upload'}
+                        onChange={(e) => setUseUrl(e.target.value === 'url')}
+                        fullWidth
+                        margin="dense"
+                        sx={getInputStyles(true, false)}
+                    >
+                        <MenuItem value="url">🌐 Paste Image URL</MenuItem>
+                        <MenuItem value="upload">📁 Upload from Computer</MenuItem>
+                    </TextField>
+
+                    {/* Conditional input */}
+                    {useUrl ? (
+                        renderTextField('cover', 'Cover Image URL')
+                    ) : (
+                        <>
+                            <Typography variant="subtitle2" sx={{ mb: 1 }}>Upload Cover Image</Typography>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleFileUpload}
+                                style={{ marginBottom: '16px' }}
+                            />
+                        </>
+                    )}
                     {formData.cover && (
                         <img
                             src={formData.cover}
@@ -168,13 +237,13 @@ export default function AddBookForm({ onAddBook, onUpdateBook, selectedBook, set
                             }}
                         />
                     )}
-                    {renderSelectField('genre', 'Genre', genres, { required: true })}
+                    {renderSelectField('genre', 'Genre', genres, true, { required: true })}
                     {renderSelectField('status', 'Status', statuses)}
-                    {renderTextField('notes', 'Notes', { multiline: true, rows: 2 })}
+                    {renderTextField('notes', 'Notes', false, { multiline: true, rows: 2 })}
 
                     {formData.status === 'Finished' && (
                         <>
-                            {renderTextField('review', 'Review', {
+                            {renderTextField('review', 'Review', false, {
                                 multiline: true,
                                 rows: 2,
                                 placeholder: "Share your thoughts about the book..."
