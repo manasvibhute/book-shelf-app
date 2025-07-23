@@ -44,6 +44,7 @@ export default function Qdashboard() {
         // If it's an edit (quote already exists)
         if (newQuote._id) {
             // PUT to backend to update it
+            console.log("Frontend Token:", localStorage.getItem('token'));
             try {
                 const res = await fetch(`/api/quotes/${newQuote._id}`, {
                     method: 'PUT',
@@ -145,6 +146,7 @@ export default function Qdashboard() {
         const fetchQuotes = async () => {
             try {
                 const token = localStorage.getItem('token');
+                console.log("📦 Frontend is sending token:", token);
                 const response = await fetch('/api/quotes', {
                     headers: {
                         Authorization: `Bearer ${token}`,

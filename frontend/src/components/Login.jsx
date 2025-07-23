@@ -46,6 +46,7 @@ function Login() {
       localStorage.setItem('token', data.token); //It's like a tiny drawer in the browser where you can save stuff (like tokens). Used to remember who's logged in
       localStorage.setItem('userId', data.user.id);
       localStorage.setItem('userEmail', data.user.email);
+      console.log("📦 Token saved to localStorage:", localStorage.getItem('token'));
       setUser(data.user);
       setSuccess(true);
       setTimeout(() => navigate('/dashboard'), 2000);

@@ -228,7 +228,7 @@ export default function Dashboard() {
                         sx={{ borderRadius: '20px' }}
                         onClick={() => navigate('/add-book')}
                     >
-                        Add a quote
+                        Add a Book
                     </Button>
                 </div>
 
